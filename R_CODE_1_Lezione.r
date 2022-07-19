@@ -1,2 +1,5 @@
-Primo script utilizzato a lezione
+# Primo script utilizzato a lezione
+
+#install.packages("raster")
+
 library(raster)
