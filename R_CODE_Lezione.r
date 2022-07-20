@@ -94,5 +94,43 @@ plot(l2011$B2_sre, col=clv)
 plot(l2011$B3_sre, col=clr)
 plot(l2011$B4_sre, col=clnir)
 
+# CREARE IMMAGINI A COLORI
+# plot l2011 in banda NIR band
+clnir <- colorRampPalette(c("red", "pink", "yellow")) (1000)
+plot(l2011$B4_sre, col=clnir)
+
+# plot RGB layers (serve per lavorare con lo schema RGB component)
+plotRGB(l2011, r=3, g=2, b=1)
+# la funzione necessita di un altro argomento, lo Stretch, per vedere meglio i contrasti
+plotRGB(l2011, r=3, g=2, b=1, stretch="lin")
+# lin = lineare
+# viene fuori l'immagine a colori naturali, quindi come la vede l'occhio umano
+# ora vogliamo visualizzare anche l'infrarosso vicino, e bisogna sacrificarne un'altra, essendo che si possono usare solo 3 bande
+plotRGB(l2011, r=4, g=3, b=2, stretch="lin")
+# da ricordare che le piante riflettono moltissimo sull'infrarosso, e avendo messo IR su R diventerà rosso nell'immagine
+# spostandolo su un'altra componente, prenderà il colore della componente (es: g=green; b= blue)
+plotRGB(l2011, r=3, g=4, b=2, stretch="lin")
+plotRGB(l2011, r=3, g=2, b=4, stretch="lin")
+
+# per mettere uno Stretch non lineare (per istogrammi)
+plotRGB(l2011, r=4, g=3, b=2, stretch="hist")
+
+# Esercizio: fare multiframe con visualizzazione a colori naturali (visible RGB), Stretch lineare e Stretch a istogrammi
+par(mfrow=c(2,1))
+plotRGB(l2011, r=3, g=2, b=1, stretch="lin")
+plotRGB(l2011, r=4, g=3, b=2, stretch="hist")
+
+# Esercizio: si va ora a paragonare due immagini, una del 1988 e una del 2011
+# carico l'immagine del 1988
+l1988 <- brick("p224r63_1988.grd")
+
+# le informazioni saranno sempre le stesse della precedente, ma cambia solo l'anno di cattura dell'immagine
+# creiamo il multiframe
+par(mfrow=c(2,1))
+plotRGB(l2011, r=4, g=3, b=2, stretch="lin")
+plotRGB(l1988, r=4, g=3, b=2, stretch="lin")
+# si vede che nel 1988 l'uomo inizia a creare le prime strade, ma c'è ancora notevolmente la foresta
+
+
 
 
