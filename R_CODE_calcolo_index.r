@@ -80,6 +80,23 @@ plot(dvi_dif, col=cl)
 #la zona rossa indica una variazione notevole, il giallo meno
 
 
+#STANDARDIZZAZIONE (NDVI)
+# Range DVI (8 bit) --> da -255 a 255
+#Standardizzato:
+# Range NDVI (8 bit) --> da -1 a 1
+# Range DVI (16 bit) --> da -65535 a 65535
+# Range NDVI (16 bit) --> da -1 a 1
+
+
+
+
+
+
+
+
+
+
+
 
 
 
