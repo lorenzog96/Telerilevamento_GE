@@ -85,13 +85,7 @@ plot(dvi_dif, col=cl)
 #Standardizzato:
 # Range NDVI (8 bit) --> da -1 a 1
 # Range DVI (16 bit) --> da -65535 a 65535
-# Range NDVI (16 bit) --> da -1 a 1
-
-Range DVI (8 bit): -255 a 255
-# Range NDVI (8 bit): -1 a 1
-
-# Range DVI (16 bit): -65535 a 65535
-# Range NDVI (16 bit): -1 a 1
+# Range NDVI (16 bit) --> da -1
 
 # Hence, NDVI can be used to compare images with a different radiometric resolution
 
@@ -121,14 +115,16 @@ plot(ndvi1992, col=cl)
 plot(ndvi2006, col=cl)
 
 # Automatic spectral indices by the spectralIndices function
+# layer 1 - NIR
+# layer 2 - red
+# layer 3 - green
 si1992 <- spectralIndices(l1992, green=3, red=2, nir=1)
 plot(si1992,col=cl)
 
 si2006 <- spectralIndices(l2006, green=3, red=2, nir=1)
 plot(si2006,col=cl)
 
-### rasterdiv
-# plot(copNDVI)
+# escono tanti indici che si possono calcolare (15)
 
 
 
