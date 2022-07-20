@@ -6,7 +6,7 @@ library(RStoolbox)
 library(rasterdiv)
 library(ggplot2)
 library(patchwork)
-setwd("C:/Users/Lorenzo/Destkop/lab")
+setwd("C:/Users/Lorenzo/Desktop/lab")
 
 # Esercizio: importare l'immagine del ghiacciaio
 sentinel <- brick("sentinel.png")
@@ -23,6 +23,8 @@ min values :          0,          0,          0,          0
 max values :        255,        255,        255,        255 
 
 # Esercizio: plottare la mappa con ggRGB
+ggRGB(sentinel, 1, 2, 3)
+# oppure
 ggRGB(sentinel, r=1, g=2, b=3, stretch="lin")
 
 # cambio composizione
@@ -32,13 +34,20 @@ ggRGB(sentinel, r=2, g=1, b=3, stretch="lin")
 sen1 <- ggRGB(sentinel, r=1, g=2, b=3, stretch="lin")
 sen2 <- ggRGB(sentinel, r=2, g=1, b=3, stretch="lin")
 sen1+sen2
+# oppure
+sen1/sen2
 
 # CALCOLARE LA VARIABILITA'
 
+#si usa una sola variabile, quindi si sceglie tra le bande che abbiamo, con:
+# indice spettrale
+# analisi multivariata
+# si sceglie la banda che discrimina di più (NIR)
+
 nir <- sentinel[[1]]
 
-sd3 <- focal(nir, matrix(1/9, 3, 3), fun=sd)
-#matrix -- matrice di 3x3 pixel; fun= function=sd deviazione standard
+sd3 <- focal(nir, w=matrix(1/9, 3, 3), fun=sd)
+#matrix -- matrice di 3x3 pixel (n di righe e n di colonne); fun= function=sd deviazione standard
 clsd <- colorRampPalette(c("blue", "green", "pink", "magenta")
 plot(sd3, col=clsd)
 
