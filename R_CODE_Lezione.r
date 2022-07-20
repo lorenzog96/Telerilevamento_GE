@@ -4,7 +4,7 @@
 library(raster)
 
 # settaggio della cartella di lavoro per Windows
-setwd("C:/Users/Lorenzo/Desktop")
+setwd("C:/Users/Lorenzo/Desktop/lab")
 
 # vado a importare dei dati RASTER (quindi immagini impilate)
 brick(x,...)
