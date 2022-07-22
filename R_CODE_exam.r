@@ -16,32 +16,20 @@ i15 <- brick("L1C_T32TQQ_A000262_20150711T100008.tif")
 # Carico il file necessari per lo studio della situazione del 2022
 i22 <- brick("L1C_T32TQQ_A028033_20220719T095747.tif")
 
-# Vediamo ora le informazioni dell'immagine satellitare creata nel 2015
-class      : RasterBrick 
-dimensions : 5490, 5490, 30140100, 3  (nrow, ncol, ncell, nlayers)
-resolution : 20, 20  (x, y)
-extent     : 699960, 809760, 4890240, 5000040  (xmin, xmax, ymin, ymax)
-crs        : +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs 
-source     : L1C_T32TQQ_A000262_20150711T100008.tif 
-names      : L1C_T32TQQ_A000262_20150711T100008.1, L1C_T32TQQ_A000262_20150711T100008.2, L1C_T32TQQ_A000262_20150711T100008.3 
-min values :                                    0,                                    0,                                    0 
-max values :                                  255,                                  255,                                  255 
+# Vado a plottare attraverso la funzione plot RGB
+r15 <- plotRGB(i15, r=1, g=2, b=3, stretch="lin")
+r22 <- plotRGB(i22, r=1, g=2, b=3, stretch="lin")
 
-# Vediamo ora le informazioni dell'immagine satellitare creata nel 2022
-class      : RasterBrick 
-dimensions : 5490, 5490, 30140100, 3  (nrow, ncol, ncell, nlayers)
-resolution : 20, 20  (x, y)
-extent     : 699960, 809760, 4890240, 5000040  (xmin, xmax, ymin, ymax)
-crs        : +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs 
-source     : L1C_T32TQQ_A028033_20220719T095747.tif 
-names      : L1C_T32TQQ_A028033_20220719T095747.1, L1C_T32TQQ_A028033_20220719T095747.2, L1C_T32TQQ_A028033_20220719T095747.3 
-min values :                                    0,                                    0,                                    0 
-max values :                                  255,                                  255,                                  255 
+# Creo un plot con un singolo multiframe con la funzione ggRGB
+a15 <- ggRGB(i15, r=1, g=2, b=3, stretch="lin")
+a22 <- ggRGB(i22, r=1, g=2, b=3, stretch="lin")
+a15 + a22
 
+# in questo modo si vedono a confronto le due situazioni, nel 2015 e nel 2022
 
-
-
-
+# Effettuo ora la classificazione dell'area di interesse
+c15 <- unsuperClass(a15, nClasses=3)
+c22 <- unsuperClass(a22, nClasses=3)
 
 
 
