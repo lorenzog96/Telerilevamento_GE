@@ -105,6 +105,21 @@ data <- data.frame(Class, Percent)
 2 Vegetation   32.78
 3       Soil   23.35
 
+# Vado ora a verificare la variabilità dell'area di interesse.
+
+# Inizio dall'effettuare l'analisi multivariata delle bande, per decidere quale variabile utilizzare.
+delPCA <- rasterPCA(delta)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
