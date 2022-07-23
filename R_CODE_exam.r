@@ -2,7 +2,7 @@
 # riguardo all'area appartenente al Parco Interregionale del Delta del Po dell'Emilia-Romagna.
 # Lo studio verte sulla classificazione e la variabilità legate al territorio e sulla copertura del suolo.
 
-# Informazioni sulle immagini: sviluppate da Sentinel-2, il giorno 17/07/2022
+# Informazioni sulle immagini: sviluppate da Sentinel-2, il giorno 17/07/2022 tra le ore 16:00 e le ore 18:00
 
 # Carico tutti i pacchetti necessari per le varie funzioni che andrò ad effettuare
 library(raster)
@@ -58,6 +58,7 @@ plotRGB(delta, r=4, g=2, b=1, stretch="lin")
 
 # Creo le classi di suddivisione dell'area, e la verifico nel plot
 delta3 <- unsuperClass(delta, nClasses=3)
+
 cl <- colorRampPalette(c("blue", "green", "yellow"))(100)
 plot(delta3$map, col=cl)
 
@@ -68,11 +69,6 @@ plot(delta3$map, col=cl)
 
 # Salvo l'immagine creata
 pdf("multi_VIS_class.pdf")
-par(mfrow=c(1,2))
-plotRGB(delta, r=4, g=2, b=1, stretch="lin")
-plot(delta3$map, col=cl)
-
-png("multi_VIS_class.png")
 par(mfrow=c(1,2))
 plotRGB(delta, r=4, g=2, b=1, stretch="lin")
 plot(delta3$map, col=cl)
@@ -108,10 +104,110 @@ data <- data.frame(Class, Percent)
 # Vado ora a verificare la variabilità dell'area di interesse.
 
 # Inizio dall'effettuare l'analisi multivariata delle bande, per decidere quale variabile utilizzare.
+# Per iniziare, importo un'immagine che pesi di meno
+del3 <- brick("delta.pdf")
+# Si tratta dell'immagine satellitare creata all'inizio attraverso le varie bande in uso.
+
+# Vado ora ad effettuare lo studio della variabilità, partendo dal metodo di Analisi Multivariata.
 delPCA <- rasterPCA(delta)
 
+# Info delPCA:
+$call
+rasterPCA(img = del3)
+
+$model
+Call:
+princomp(cor = spca, covmat = covMat[[1]])
+
+Standard deviations:
+   Comp.1    Comp.2    Comp.3 
+75.189163 33.288869  6.865298 
+
+ 3  variables and  1102500 observations.
+
+$map
+class      : RasterBrick 
+dimensions : 1050, 1050, 1102500, 3  (nrow, ncol, ncell, nlayers)
+resolution : 1, 1  (x, y)
+extent     : 0, 1050, 0, 1050  (xmin, xmax, ymin, ymax)
+crs        : NA 
+source     : memory
+names      :        PC1,        PC2,        PC3 
+min values : -159.26929, -116.80498,  -91.97826 
+max values :   279.3643,   179.6011,   122.1632 
 
 
+attr(,"class")
+[1] "rasterPCA" "RStoolbox"
+
+# Si nota come l'immagine caricata sia composta solo da 3 variabili, e da 1.102.500 osservazioni.
+# Vado ora a vedere quanto pesano le 3 variabili sulla costruzione della variabilità dell'immagine.
+summary(delPCA$model)
+
+# Info delPCA$model:
+Importance of components:
+                           Comp.1     Comp.2      Comp.3
+Standard deviation     75.1891634 33.2888691 6.865297918
+Proportion of Variance  0.8303226  0.1627550 0.006922375
+Cumulative Proportion   0.8303226  0.9930776 1.000000000
+
+# Come indicato dal Dataframe in uscita, si nota che:
+# - la componente 1 riesce a spiegare ben l'83.02% della variabilità dell'immagine;
+# - la componente 2 spiega il 16.28% della variabilità;
+# - la componente 3 spiega lo 0.7%
+
+# Di conseguenza, scelgo la componente n.1 per spiegare la variabilità dell'immagine.
+
+# Controllo graficamente che i dati ottenuti dall'analisi multivariata siano rappresentativi.
+comp1 <- (delPCA$map$PC1)
+comp2 <- (delPCA$map$PC2)
+comp3 <- (delPCA$map$PC3)
+
+# Creo un Multiframe con ggplot per la verifica grafica.
+c1 <- ggplot() +
+geom_raster(comp1, mapping=aes(x=x, y=y, fill=PC1))
+
+c2 <- ggplot() +
+geom_raster(comp2, mapping=aes(x=x, y=y, fill=PC2))
+
+c3 <- ggplot() +
+geom_raster(comp3, mapping=aes(x=x, y=y, fill=PC3))
+
+c1+ c2+ c3
+
+# Creo il PDF
+pdf("rappr_analisi_multi.pdf")
+c1+ c2+ c3
+
+# Calcolo infine la Deviazione Standard sulla componente 1.
+sd3 <- focal(comp1, matrix(1/9, 3, 3), fun=sd)
+
+# Info sd3
+class      : RasterLayer 
+dimensions : 1050, 1050, 1102500  (nrow, ncol, ncell)
+resolution : 1, 1  (x, y)
+extent     : 0, 1050, 0, 1050  (xmin, xmax, ymin, ymax)
+crs        : NA 
+source     : memory
+names      : layer 
+values     : 0, 21.27449  (min, max)
+
+# Creo il plot della deviazione standard con ggplot.
+ggplot() +
+geom_raster(sd3, mapping=aes(x=x, y=y, fill=layer)) +
+scale_fill_viridis (option="magma")
+
+# Creo un Multiframe per mettere a confronto Visibile, Componente 1 e Variabilità
+a1 <- ggRGB(del3, 1, 2, 3)
+
+a2 <- ggplot() +
+geom_raster(comp1, mapping=aes(x=x, y=y, fill=PC1))
+
+a3 <- ggplot() +
+geom_raster(sd3, mapping=aes(x=x, y=y, fill=layer)) +
+scale_fill_viridis (option="magma")
+
+a1 + a2 + a3
 
 
 
