@@ -36,11 +36,11 @@ ilist <- list.files(pattern="T32TQQ_")
 # B02 = Blue
 # B03 = Green
 # B04 = Red
-# B05 = Vegetation Red Edge
+# B05 = Vegetation Red Edge (infrarosso vicino riflesso dalle piante)
 # B06 = Vegetation Red Edge
 # B07 = Vegetation Red Edge
 # B8A = Vegetation Red Edge
-# B11 = SWIR
+# B11 = SWIR (Infrarosso onda corta)
 # B12 = SWIR
 
 # Vado ad importare la lista di file, oggetto "podelta"
@@ -247,44 +247,28 @@ a1 + a2 + a3
 
 # Effettuo ora lo studio dell'Indice di Vegetazione.
 
-# Creo un'immagine eliminando le bande non necessarie per lo studio, inserendo quindi una nuova cartella personale, dove si trovano i file (bande) necessarie.
-setwd("C:/Users/Lorenzo/Desktop/exam/NDVI")
+# Richiamo l'immagine delta creata all'inizio dall'impilare tutte le bande.
+delta
 
-flist <- list.files(pattern="T32TQQ_")
-
-[1] "T32TQQ_20220717T100611_B02_20m.jp2"
-[2] "T32TQQ_20220717T100611_B03_20m.jp2"
-[3] "T32TQQ_20220717T100611_B04_20m.jp2"
-[4] "T32TQQ_20220717T100611_B05_20m.jp2"
-[5] "T32TQQ_20220717T100611_B06_20m.jp2"
-[6] "T32TQQ_20220717T100611_B07_20m.jp2"
-[7] "T32TQQ_20220717T100611_B8A_20m.jp2"
-
-# Vado ad importare la lista di file, conferendo come oggetto "deltadvi".
-deltadvi <- lapply(flist, raster)
-
-# li inserisco tutti in un unico stack.
-dvidelta <- stack(deltadvi)
-
-# Info dvidelta:
+# Info delta:
 class      : RasterStack 
-dimensions : 5490, 5490, 30140100, 7  (nrow, ncol, ncell, nlayers)
+dimensions : 5490, 5490, 30140100, 10  (nrow, ncol, ncell, nlayers)
 resolution : 20, 20  (x, y)
 extent     : 699960, 809760, 4890240, 5000040  (xmin, xmax, ymin, ymax)
 crs        : +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs 
-names      : T32TQQ_20//11_B02_20m, T32TQQ_20//11_B03_20m, T32TQQ_20//11_B04_20m, T32TQQ_20//11_B05_20m, T32TQQ_20//11_B06_20m, T32TQQ_20//11_B07_20m, T32TQQ_20//11_B8A_20m 
-min values :                     0,                     0,                     0,                     0,                     0,                     0,                     0 
-max values :                 65535,                 65535,                 65535,                 65535,                 65535,                 65535,                 65535 
+names      : T32TQQ_20//11_B01_20m, T32TQQ_20//11_B02_20m, T32TQQ_20//11_B03_20m, T32TQQ_20//11_B04_20m, T32TQQ_20//11_B05_20m, T32TQQ_20//11_B06_20m, T32TQQ_20//11_B07_20m, T32TQQ_20//11_B11_20m, T32TQQ_20//11_B12_20m, T32TQQ_20//11_B8A_20m 
+min values :                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0 
+max values :                 65535,                 65535,                 65535,                 65535,                 65535,                 65535,                 65535,                 65535,                 65535,                 65535 
 
 # Effettuo il plot dell'immagine satellitare che ne deriva.
-plotRGB(dvidelta, r=4, g=3, b=2, stretch="lin")
+plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 
 # Vado ora ad effettuare lo studio dell'Indice di Vegetazione (DVI).
 # DVI -> Differential Vegetation Index
 # DVI = NIR - red (il calcolo vede sottrarre la banda del rosso dalla banda di infrarosso vicino, in quanto le piante hanno più alta riflettanza su tale banda
 #       rispetto al resto degli elementi presenti in un'immagine satellitare.
-NIR <- dvidelta[[4]] + dvidelta[[5]] + dvidelta[[6]] + dvidelta[[7]]
-dvi2022 <- NIR - dvidelta[[3]]
+NIR <- delta[[4]] + delta[[5]] + delta[[6]] + delta[[7]] + delta[[8]] + delta[[9]] + delta[[10]]
+dvi2022 <- NIR - delta[[3]]
 
 # Info dvi2022
 class      : RasterLayer 
@@ -292,9 +276,9 @@ dimensions : 5490, 5490, 30140100  (nrow, ncol, ncell)
 resolution : 20, 20  (x, y)
 extent     : 699960, 809760, 4890240, 5000040  (xmin, xmax, ymin, ymax)
 crs        : +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs 
-source     : r_tmp_2022-07-24_121314_12416_67939.grd 
+source     : r_tmp_2022-07-24_213820_492_70408.grd 
 names      : layer 
-values     : 0, 60724  (min, max)
+values     : 0, 109656  (min, max)
 
 # Creo il plot del DVI
 cl <- colorRampPalette(c("dark blue", "yellow", "red", "black")) (100)
@@ -306,7 +290,7 @@ plot(dvi2022, col=cl)
 
 # Vado ora a standardizzare il risultato, in modo tale da poterlo eventualmente confrontare con altre elaborazioni.
 # NDVI = Normalized Diferential Vegetation Index
-ndvi2022 <- dvi2022/(NIR+dvidelta[[3]])
+ndvi2022 <- dvi2022/(NIR+delta[[3]])
 
 # Info ndvi2022
 class      : RasterLayer 
@@ -314,16 +298,16 @@ dimensions : 5490, 5490, 30140100  (nrow, ncol, ncell)
 resolution : 20, 20  (x, y)
 extent     : 699960, 809760, 4890240, 5000040  (xmin, xmax, ymin, ymax)
 crs        : +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs 
-source     : r_tmp_2022-07-24_122954_12416_33240.grd 
+source     : r_tmp_2022-07-24_214238_492_43108.grd 
 names      : layer 
-values     : 0.1379958, 0.9157373  (min, max)
+values     : 0.4370455, 0.9318111  (min, max)
 
 # Da notare la normalizzazione visibile nei valori di min e max (tra 0 e 1 - non tiene in considerazione i bit dell'immagine).
 # L'immagine che si crea va a evidenziare ancora meglio la vegetazione presente (in rosso, la riflettanza più elevata).
 
 # Infine plottiamo in un unico Multiframe l'Indice di Vegetazione e l'immagine satellitare di partenza.
 par(mfrow=c(1,2))
-plotRGB(dvidelta, r=4, g=3, b=2, stretch="lin")
+plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 plot(ndvi2022, col=cl)
 
 ### Fine progetto ###
