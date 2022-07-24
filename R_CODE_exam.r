@@ -1,3 +1,5 @@
+### Inizio Progetto ###
+
 # Progetto volto allo studio dell'area est della regione emiliano-romagnola, con particolar
 # riguardo all'area appartenente al Parco Interregionale del Delta del Po dell'Emilia-Romagna.
 # Lo studio verte sulla classificazione e la variabilità legate al territorio e sulla copertura del suolo.
@@ -30,6 +32,18 @@ ilist <- list.files(pattern="T32TQQ_")
 [8] "T32TQQ_20220717T100611_B11_20m.jp2"
 [9] "T32TQQ_20220717T100611_B12_20m.jp2"
 [10] "T32TQQ_20220717T100611_B8A_20m.jp2"
+
+# Le bande riflettono rispettivamente nelle bande di:
+# B01 = Coastal Aerosol
+# B02 = Blue
+# B03 = Green
+# B04 = Red
+# B05 = Vegetation Red Edge
+# B06 = Vegetation Red Edge
+# B07 = Vegetation Red Edge
+# B8A = Vegetation Red Edge
+# B11 = SWIR
+# B12 = SWIR
 
 # Vado ad importare la lista di file, conferendo come oggetto "podelta"
 podelta <- lapply(ilist, raster)
@@ -215,17 +229,86 @@ scale_fill_viridis (option="inferno")
 
 a1 + a2 + a3
 
+# Effettuo ora lo studio dell'Indice di Vegetazione.
 
+# Creo un'immagine eliminando le bande non necessarie per lo studio
+setwd("C:/Users/Lorenzo/Desktop/exam/NDVI")
 
+flist <- list.files(pattern="T32TQQ_")
 
+[1] "T32TQQ_20220717T100611_B02_20m.jp2"
+[2] "T32TQQ_20220717T100611_B03_20m.jp2"
+[3] "T32TQQ_20220717T100611_B04_20m.jp2"
+[4] "T32TQQ_20220717T100611_B05_20m.jp2"
+[5] "T32TQQ_20220717T100611_B06_20m.jp2"
+[6] "T32TQQ_20220717T100611_B07_20m.jp2"
+[7] "T32TQQ_20220717T100611_B8A_20m.jp2"
 
+# Vado ad importare la lista di file, conferendo come oggetto "deltadvi"
+deltadvi <- lapply(flist, raster)
 
+# li inserisco tutti in un unico stack
+dvidelta <- stack(deltadvi)
 
+# Info dvidelta:
+class      : RasterStack 
+dimensions : 5490, 5490, 30140100, 7  (nrow, ncol, ncell, nlayers)
+resolution : 20, 20  (x, y)
+extent     : 699960, 809760, 4890240, 5000040  (xmin, xmax, ymin, ymax)
+crs        : +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs 
+names      : T32TQQ_20//11_B02_20m, T32TQQ_20//11_B03_20m, T32TQQ_20//11_B04_20m, T32TQQ_20//11_B05_20m, T32TQQ_20//11_B06_20m, T32TQQ_20//11_B07_20m, T32TQQ_20//11_B8A_20m 
+min values :                     0,                     0,                     0,                     0,                     0,                     0,                     0 
+max values :                 65535,                 65535,                 65535,                 65535,                 65535,                 65535,                 65535 
 
+# Effettuo il plot dell'immagine satellitare che ne deriva.
+plotRGB(dvidelta, r=4, g=3, b=2, stretch="lin")
 
+# Vado ora ad effettuare lo studio dell'Indice di Vegetazione (DVI)
+# DVI = NIR - red
+NIR <- dvidelta[[4]] + dvidelta[[5]] + dvidelta[[6]] + dvidelta[[7]]
+dvi2022 <- NIR - dvidelta[[3]]
 
+# Info dvi2022
+class      : RasterLayer 
+dimensions : 5490, 5490, 30140100  (nrow, ncol, ncell)
+resolution : 20, 20  (x, y)
+extent     : 699960, 809760, 4890240, 5000040  (xmin, xmax, ymin, ymax)
+crs        : +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs 
+source     : r_tmp_2022-07-24_121314_12416_67939.grd 
+names      : layer 
+values     : 0, 60724  (min, max)
 
+# Creo il plot del DVI
+cl <- colorRampPalette(c("dark blue", "yellow", "red", "black")) (100)
+plot(dvi2022, col=cl)
 
+# L'immagine che esce è caratterizzata da un'enorme distesa blu, legata alla presenza di acqua, che non riflette/riflette pochissimo
+# nella banda del NIR; l'enorme presenza di giallo, invece, conferma una grande distesa di vegetazione, formata sia da zona rurale, 
+# che da zone boschive (canneti di zone umide, pinete, boschi igrofili).
 
+# Vado ora a standardizzare il risultato, in modo tale da poterlo eventualmente confrontare con altre elaborazioni.
+# NDVI = Normalized Diferential Vegetation Index
+ndvi2022 <- dvi2022/(NIR+dvidelta[[3]])
+
+# Info ndvi2022
+class      : RasterLayer 
+dimensions : 5490, 5490, 30140100  (nrow, ncol, ncell)
+resolution : 20, 20  (x, y)
+extent     : 699960, 809760, 4890240, 5000040  (xmin, xmax, ymin, ymax)
+crs        : +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs 
+source     : r_tmp_2022-07-24_122954_12416_33240.grd 
+names      : layer 
+values     : 0.1379958, 0.9157373  (min, max)
+
+# Da notare la normalizzazione visibile nei valori di min e max (tra 0 e 1)
+
+# L'immagine che si crea va a evidenziare ancora meglio la vegetazione presente (in rosso, la riflettanza più elevata).
+
+# Infine plottiamo in un unico Multiframe l'Indice di Vegetazione e l'immagine satellitare di partenza.
+par(mfrow=c(1,2))
+plotRGB(dvidelta, r=4, g=3, b=2, stretch="lin")
+plot(ndvi2022, col=cl)
+
+### Fine progetto ###
 
 
