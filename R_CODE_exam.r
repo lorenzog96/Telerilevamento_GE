@@ -51,10 +51,15 @@ max values :                 65535,                 65535,                 65535
 # Effettuo il plot dell'immagine satellitare che ne deriva.
 plotRGB(delta, r=4, g=2, b=1, stretch="lin")
 
+# Creo un pdf del plot
+pdf("delta.pdf")
+plotRGB(delta, r=4, g=2, b=1, stretch="lin")
+
 # Con questa modalità si vede l'immagine nel visibile (come la vedremmo con i nostri occhi).
-# Layer 1 = Red
+# Layer 1 = Blue
 # Layer 2 = Green
-# Layer 3 = Blue
+# Layer 3 = NIR
+# Layer 4 = Red
 
 # Creo le classi di suddivisione dell'area, e la verifico nel plot
 delta3 <- unsuperClass(delta, nClasses=3)
@@ -109,7 +114,7 @@ del3 <- brick("delta.pdf")
 # Si tratta dell'immagine satellitare creata all'inizio attraverso le varie bande in uso.
 
 # Vado ora ad effettuare lo studio della variabilità, partendo dal metodo di Analisi Multivariata.
-delPCA <- rasterPCA(delta)
+delPCA <- rasterPCA(del3)
 
 # Info delPCA:
 $call
@@ -205,7 +210,7 @@ geom_raster(comp1, mapping=aes(x=x, y=y, fill=PC1))
 
 a3 <- ggplot() +
 geom_raster(sd3, mapping=aes(x=x, y=y, fill=layer)) +
-scale_fill_viridis (option="magma")
+scale_fill_viridis (option="inferno")
 
 a1 + a2 + a3
 
