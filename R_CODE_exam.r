@@ -2,26 +2,25 @@
 
 # Progetto volto allo studio dell'area est della regione emiliano-romagnola, con particolar
 # riguardo all'area appartenente al Parco Interregionale del Delta del Po dell'Emilia-Romagna.
-# Lo studio verte sulla classificazione e la variabilità legate al territorio e sulla copertura del suolo.
+# Lo studio verte sulla classificazione e la variabilità legate al territorio, sulla copertura del suolo, quindi sull'Indice di Vegetazione.
 
-# Informazioni sulle immagini: sviluppate da Sentinel-2, il giorno 17/07/2022 tra le ore 16:00 e le ore 18:00
+# Immagini Telerilevate: sviluppate da Sentinel-2 (filtro 2A), il giorno 17/07/2022 tra le ore 16:00 e le ore 18:00
 
 # Carico tutti i pacchetti necessari per le varie funzioni che andrò ad effettuare
-library(raster)
-library(RStoolbox)
-library(rasterdiv)
-library(ggplot2)
-library(patchwork)
-library(viridis)
-library(sdm)
+library(raster) # Necessario per caricare e operare dati raster ("immagini sovrapposte - bande")
+library(RStoolbox) # Necessario per la produzione degli Indici Spettrali e la Classificazione
+library(rasterdiv) # Pacchetto utile per definire indici di diversità tra differenti matrici
+library(ggplot2) # Necessario come altra modalità oltre a raster di tradurre graficamente i dati
+library(patchwork) # Pacchetto semplificato per la produzione di Multiframe
+library(viridis) # Pacchetto utile per aggiungere palette di colori preimpostati e utili per lo studio
 
 # Carico la cartella da cui verranno prelevati i file
 setwd("C:/Users/Lorenzo/Desktop/exam")
 
-# Carico la lista dei file necessari
+# Carico la lista dei file necessari, conferendo come oggetto "images-list"
 ilist <- list.files(pattern="T32TQQ_")
 
-# Info ilist
+# Info ilist (si tratta di file .jp2, che rappresentano le varie bande dello spettro di onde che vengono captate da Sentinel-2):
 [1] "T32TQQ_20220717T100611_B01_20m.jp2"
 [2] "T32TQQ_20220717T100611_B02_20m.jp2"
 [3] "T32TQQ_20220717T100611_B03_20m.jp2"
@@ -33,7 +32,7 @@ ilist <- list.files(pattern="T32TQQ_")
 [9] "T32TQQ_20220717T100611_B12_20m.jp2"
 [10] "T32TQQ_20220717T100611_B8A_20m.jp2"
 
-# Le bande riflettono rispettivamente nelle bande di:
+# Le bande riflettono rispettivamente:
 # B01 = Coastal Aerosol
 # B02 = Blue
 # B03 = Green
@@ -45,10 +44,10 @@ ilist <- list.files(pattern="T32TQQ_")
 # B11 = SWIR
 # B12 = SWIR
 
-# Vado ad importare la lista di file, conferendo come oggetto "podelta"
+# Vado ad importare la lista di file, oggetto "podelta"
 podelta <- lapply(ilist, raster)
 
-# li inserisco tutti in un unico stack
+# li inserisco tutti in un unico stack, in modo da sovrapporre le varie bande in un'unica immagine telerilevata.
 delta <- stack(podelta)
 
 # Info "delta"
@@ -61,12 +60,24 @@ names      : T32TQQ_20//11_B01_20m, T32TQQ_20//11_B02_20m, T32TQQ_20//11_B03_20m
 min values :                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0,                     0 
 max values :                 65535,                 65535,                 65535,                 65535,                 65535,                 65535,                 65535,                 65535,                 65535,                 65535 
 
-# In questo modo i 10 file sono diventati un'unica immagine.
+# Cosa significano i dati che ne fuoriescono:
+# - RasterStack rappresenta la classe di appartenenza dell'immagine, e la inserisce tra le immagini ("stack") formate da più rasterLayer ("banda singola").
+# - Le dimensioni definiscono: 5490 righe, 5490 colonne, 30.140.100 pixel totali, 10 bande.
+# - Risoluzione = 20 metri.
+# - Estensione: rappresentano i pixel di partenza e di arrivo, sia nella componente x che nella y.
+# - Crs va ad indicare i Sistemi di Riferimento: UTM (Universal Transverse Mercator) - suddivisione del Mondo in 60 spicchi; 32 rappresenta lo spicchio di appartenza 
+#   dell'immagine in questione; WGS84 rappresenta l'ellissoide di riferimento; unità di misura: metro.
+# - Nomi dei file ("bande") che compongono il RasterStack.
+# - Minimo e Massimo sono i valori min e max di riflettanza delle varie bande
+
+# NB: (la riflettanza è la divisione tra quanto flusso radiante viene riflesso e quanto viene assorbito)
+# Se assorbo tutta la radiazione, la riflettanza è pari a 0; se viene riflessa tutta la luce, la riflettanza (in questo caso) è 65535 (16 bit).
 
 # Effettuo il plot dell'immagine satellitare che ne deriva.
 plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 
-# Creo un pdf del plot
+# Creo un pdf del plot, nominandolo "delta.pdf"; 
+# il file finirà direttamente all'interno della cartella richiamata all'inizio.
 pdf("delta.pdf")
 plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 
@@ -75,8 +86,10 @@ plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 # Layer 3 = Green
 # Layer 4 = Red
 # Layer 5 = NIR
+# NB: bande legate al satellite Sentinel-2.
 
-# Creo le classi di suddivisione dell'area, e la verifico nel plot
+# Creo le Classi di suddivisione dell'area, e la verifico nel plot
+# Decido di creare 3 classi, in quanto i componenti principali del territorio sono: acqua, suolo nudo, vegetazione.
 delta3 <- unsuperClass(delta, nClasses=3)
 
 cl <- colorRampPalette(c("yellow", "blue", "green"))(100)
@@ -87,30 +100,30 @@ par(mfrow=c(1,2))
 plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 plot(delta3$map, col=cl)
 
-# Salvo l'immagine creata
+# Salvo l'immagine creata in pdf, denominazione "multi_VIS_class.pdf".
 pdf("multi_VIS_class.pdf")
 par(mfrow=c(1,2))
 plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 plot(delta3$map, col=cl)
 
-# Vado a calcolare le Frequenze delle classi
+# Vado a calcolare le Frequenze delle classi.
 freq(delta3$map)
      value    count
 [1,]     1  7827975
 [2,]     2 13290500
 [3,]     3  9021625
 
-# Dalle frequenze si nota come l'area considerata è prevalentemente coperta da acqua (classe 2),
+# Dalle frequenze si nota come l'area considerata è prevalentemente ricoperta da acqua (classe 2 - richiama il maggior numero di pixel),
 # in particolar modo a causa della presenza dell'Adriatico. Per quanto riguarda suolo incolto e aree
 # vegetate (agricoltura e pinete), rispettivamente classe 1 e classe 3, hanno una frequenza abbastanza simile fra loro.
 
-# Per visionare la percentuale occupata dalle varie classi:
+# Utilizzo i dati di frequenza per creare le percentuali di suddivisione del Land Cover.
 totdelta <- 30140100
 perc_acq <- (13290500*100)/totdelta
 perc_veg <- (9021625*100)/totdelta
 perc_suo <- 100 - (perc_acq + perc_veg)
 
-# Credo un Dataframe per sistemare i risultati
+# Creo un Dataframe per sistemare i risultati percentuali.
 Class <- c("Water", "Vegetation", "Soil")
 Percent <- c(44.1, 25.97, 29.93)
 data <- data.frame(Class, Percent)
@@ -121,14 +134,15 @@ data <- data.frame(Class, Percent)
 2 Vegetation   25.97
 3       Soil   29.93
 
-# Vado ora a verificare la variabilità dell'area di interesse.
+# Vado ora a verificare la Variabilità dell'area di interesse.
 
-# Inizio dall'effettuare l'analisi multivariata delle bande, per decidere quale variabile utilizzare.
-# Per iniziare, importo un'immagine che pesi di meno
+# Inizio con l'effettuare l'Analisi Multivariata delle bande, per decidere quale variabile utilizzare.
+# Per iniziare, importo un'immagine che pesi di meno (con lo stack iniziale R non riesce ad effettuare il calcolo).
 del3 <- brick("delta_VIS.pdf")
-# Si tratta dell'immagine satellitare creata all'inizio attraverso le varie bande in uso.
+# Si tratta dell'immagine satellitare creata all'inizio attraverso le varie bande in uso 
+# (caricata in modo singolo, in quanto le bande sono già tutte inserite insieme).
 
-# Vado ora ad effettuare lo studio della variabilità, partendo dal metodo di Analisi Multivariata.
+# Vado ora ad effettuare lo studio della Variabilità, partendo dal metodo di Analisi Multivariata (oggetto "delta-PCA").
 delPCA <- rasterPCA(del3)
 
 # Info delPCA:
@@ -176,7 +190,7 @@ Cumulative Proportion   0.9232639  0.98404988  1.00000000
 # - la componente 2 spiega il 6.08% della variabilità;
 # - la componente 3 spiega lo 1.59%
 
-# Di conseguenza, scelgo la componente n.1 per spiegare la variabilità dell'immagine.
+# Di conseguenza, scelgo la componente n.1 per spiegare la variabilità dell'immagine (in quanto vado ad utilizzare una sola variabile).
 
 # Controllo graficamente che i dati ottenuti dall'analisi multivariata siano rappresentativi.
 comp1 <- (delPCA$map$PC1)
@@ -212,12 +226,14 @@ source     : memory
 names      : layer 
 values     : 0, 21.04971  (min, max)
 
+# I dati risultanti indicano che i valori di deviazione standard sull'immagine plottata vanno da 0 a 21.
+
 # Creo il plot della deviazione standard con ggplot.
 ggplot() +
 geom_raster(sd3, mapping=aes(x=x, y=y, fill=layer)) +
 scale_fill_viridis (option="magma")
 
-# Creo un Multiframe per mettere a confronto Visibile, Componente 1 e Variabilità
+# Creo un Multiframe per mettere a confronto: Visibile, Componente 1 e Variabilità.
 a1 <- ggRGB(del3, 1, 2, 3)
 
 a2 <- ggplot() +
@@ -231,7 +247,7 @@ a1 + a2 + a3
 
 # Effettuo ora lo studio dell'Indice di Vegetazione.
 
-# Creo un'immagine eliminando le bande non necessarie per lo studio
+# Creo un'immagine eliminando le bande non necessarie per lo studio, inserendo quindi una nuova cartella personale, dove si trovano i file (bande) necessarie.
 setwd("C:/Users/Lorenzo/Desktop/exam/NDVI")
 
 flist <- list.files(pattern="T32TQQ_")
@@ -244,10 +260,10 @@ flist <- list.files(pattern="T32TQQ_")
 [6] "T32TQQ_20220717T100611_B07_20m.jp2"
 [7] "T32TQQ_20220717T100611_B8A_20m.jp2"
 
-# Vado ad importare la lista di file, conferendo come oggetto "deltadvi"
+# Vado ad importare la lista di file, conferendo come oggetto "deltadvi".
 deltadvi <- lapply(flist, raster)
 
-# li inserisco tutti in un unico stack
+# li inserisco tutti in un unico stack.
 dvidelta <- stack(deltadvi)
 
 # Info dvidelta:
@@ -263,8 +279,10 @@ max values :                 65535,                 65535,                 65535
 # Effettuo il plot dell'immagine satellitare che ne deriva.
 plotRGB(dvidelta, r=4, g=3, b=2, stretch="lin")
 
-# Vado ora ad effettuare lo studio dell'Indice di Vegetazione (DVI)
-# DVI = NIR - red
+# Vado ora ad effettuare lo studio dell'Indice di Vegetazione (DVI).
+# DVI -> Differential Vegetation Index
+# DVI = NIR - red (il calcolo vede sottrarre la banda del rosso dalla banda di infrarosso vicino, in quanto le piante hanno più alta riflettanza su tale banda
+#       rispetto al resto degli elementi presenti in un'immagine satellitare.
 NIR <- dvidelta[[4]] + dvidelta[[5]] + dvidelta[[6]] + dvidelta[[7]]
 dvi2022 <- NIR - dvidelta[[3]]
 
@@ -300,8 +318,7 @@ source     : r_tmp_2022-07-24_122954_12416_33240.grd
 names      : layer 
 values     : 0.1379958, 0.9157373  (min, max)
 
-# Da notare la normalizzazione visibile nei valori di min e max (tra 0 e 1)
-
+# Da notare la normalizzazione visibile nei valori di min e max (tra 0 e 1 - non tiene in considerazione i bit dell'immagine).
 # L'immagine che si crea va a evidenziare ancora meglio la vegetazione presente (in rosso, la riflettanza più elevata).
 
 # Infine plottiamo in un unico Multiframe l'Indice di Vegetazione e l'immagine satellitare di partenza.
