@@ -111,7 +111,7 @@ data <- data.frame(Class, Percent)
 
 # Inizio dall'effettuare l'analisi multivariata delle bande, per decidere quale variabile utilizzare.
 # Per iniziare, importo un'immagine che pesi di meno
-del3 <- brick("delta.pdf")
+del3 <- brick("delta_VIS.pdf")
 # Si tratta dell'immagine satellitare creata all'inizio attraverso le varie bande in uso.
 
 # Vado ora ad effettuare lo studio della variabilità, partendo dal metodo di Analisi Multivariata.
@@ -126,8 +126,8 @@ Call:
 princomp(cor = spca, covmat = covMat[[1]])
 
 Standard deviations:
-   Comp.1    Comp.2    Comp.3 
-75.189163 33.288869  6.865298 
+  Comp.1   Comp.2   Comp.3 
+85.07704 21.82987 11.18231 
 
  3  variables and  1102500 observations.
 
@@ -138,9 +138,9 @@ resolution : 1, 1  (x, y)
 extent     : 0, 1050, 0, 1050  (xmin, xmax, ymin, ymax)
 crs        : NA 
 source     : memory
-names      :        PC1,        PC2,        PC3 
-min values : -159.26929, -116.80498,  -91.97826 
-max values :   279.3643,   179.6011,   122.1632 
+names      :       PC1,       PC2,       PC3 
+min values : -144.6142, -103.3550, -125.3460 
+max values :  293.0341,  124.4206,  120.2690 
 
 
 attr(,"class")
@@ -152,15 +152,15 @@ summary(delPCA$model)
 
 # Info delPCA$model:
 Importance of components:
-                           Comp.1     Comp.2      Comp.3
-Standard deviation     75.1891634 33.2888691 6.865297918
-Proportion of Variance  0.8303226  0.1627550 0.006922375
-Cumulative Proportion   0.8303226  0.9930776 1.000000000
+                           Comp.1      Comp.2      Comp.3
+Standard deviation     85.0770414 21.82986595 11.18230755
+Proportion of Variance  0.9232639  0.06078596  0.01595012
+Cumulative Proportion   0.9232639  0.98404988  1.00000000
 
 # Come indicato dal Dataframe in uscita, si nota che:
-# - la componente 1 riesce a spiegare ben l'83.02% della variabilità dell'immagine;
-# - la componente 2 spiega il 16.28% della variabilità;
-# - la componente 3 spiega lo 0.7%
+# - la componente 1 riesce a spiegare ben il 92.33% della variabilità dell'immagine;
+# - la componente 2 spiega il 6.08% della variabilità;
+# - la componente 3 spiega lo 1.59%
 
 # Di conseguenza, scelgo la componente n.1 per spiegare la variabilità dell'immagine.
 
@@ -196,7 +196,7 @@ extent     : 0, 1050, 0, 1050  (xmin, xmax, ymin, ymax)
 crs        : NA 
 source     : memory
 names      : layer 
-values     : 0, 21.27449  (min, max)
+values     : 0, 21.04971  (min, max)
 
 # Creo il plot della deviazione standard con ggplot.
 ggplot() +
