@@ -214,7 +214,7 @@ c1+ c2+ c3
 pdf("rappr_analisi_multi.pdf")
 c1+ c2+ c3
 
-# Calcolo infine la Deviazione Standard sulla componente 1.
+# Calcolo infine la Deviazione Standard sulla componente 1 (finestra 3x3).
 sd3 <- focal(comp1, matrix(1/9, 3, 3), fun=sd)
 
 # Info sd3
