@@ -4,12 +4,11 @@
 # riguardo all'area appartenente al Parco Interregionale del Delta del Po dell'Emilia-Romagna.
 # Lo studio verte sulla classificazione e la variabilità legate al territorio, sulla copertura del suolo, quindi sull'Indice di Vegetazione.
 
-# Immagini Telerilevate: sviluppate da Sentinel-2 (filtro 2A), il giorno 17/07/2022 tra le ore 16:00 e le ore 18:00
+# Immagini Telerilevate: sviluppate da Sentinel-2 (lancio: 23 giugno 2015) (filtro 2A), il giorno 17/07/2022 tra le ore 16:00 e le ore 18:00
 
 # Carico tutti i pacchetti necessari per le varie funzioni che andrò ad effettuare
 library(raster) # Necessario per caricare e operare dati raster ("immagini sovrapposte - bande")
 library(RStoolbox) # Necessario per la produzione degli Indici Spettrali e la Classificazione
-library(rasterdiv) # Pacchetto utile per definire indici di diversità tra differenti matrici
 library(ggplot2) # Necessario come altra modalità oltre a raster per tradurre graficamente i dati
 library(patchwork) # Pacchetto semplificato per la produzione di Multiframe
 library(viridis) # Pacchetto utile per aggiungere palette di colori preimpostati e utili per lo studio
