@@ -10,11 +10,11 @@
 library(raster) # Necessario per caricare e operare dati raster ("immagini sovrapposte - bande")
 library(RStoolbox) # Necessario per la produzione degli Indici Spettrali e la Classificazione
 library(rasterdiv) # Pacchetto utile per definire indici di diversità tra differenti matrici
-library(ggplot2) # Necessario come altra modalità oltre a raster di tradurre graficamente i dati
+library(ggplot2) # Necessario come altra modalità oltre a raster per tradurre graficamente i dati
 library(patchwork) # Pacchetto semplificato per la produzione di Multiframe
 library(viridis) # Pacchetto utile per aggiungere palette di colori preimpostati e utili per lo studio
 
-# Carico la cartella da cui verranno prelevati i file
+# Definisco la cartella da cui verranno prelevati i file
 setwd("C:/Users/Lorenzo/Desktop/exam")
 
 # Carico la lista dei file necessari, conferendo come oggetto "images-list"
@@ -64,16 +64,16 @@ max values :                 65535,                 65535,                 65535
 # - RasterStack rappresenta la classe di appartenenza dell'immagine, e la inserisce tra le immagini ("stack") formate da più rasterLayer ("banda singola").
 # - Le dimensioni definiscono: 5490 righe, 5490 colonne, 30.140.100 pixel totali, 10 bande.
 # - Risoluzione = 20 metri.
-# - Estensione: rappresentano i pixel di partenza e di arrivo, sia nella componente x che nella y.
+# - Estensione: rappresentano i pixel di partenza e di arrivo, sia nella componente x che nella y (numero legato alla distanza dall'equatore e dal meridiano).
 # - Crs va ad indicare i Sistemi di Riferimento: UTM (Universal Transverse Mercator) - suddivisione del Mondo in 60 spicchi; 32 rappresenta lo spicchio di appartenza 
-#   dell'immagine in questione; WGS84 rappresenta l'ellissoide di riferimento; unità di misura: metro.
+#   per l'immagine in questione; WGS84 rappresenta l'ellissoide di riferimento; unità di misura: metro.
 # - Nomi dei file ("bande") che compongono il RasterStack.
-# - Minimo e Massimo sono i valori min e max di riflettanza delle varie bande
+# - Minimo e Massimo sono i valori min e max di riflettanza delle varie bande.
 
-# NB: (la riflettanza è la divisione tra quanto flusso radiante viene riflesso e quanto viene assorbito)
-# Se assorbo tutta la radiazione, la riflettanza è pari a 0; se viene riflessa tutta la luce, la riflettanza (in questo caso) è 65535 (16 bit).
+# NB: (la riflettanza è la divisione tra quanto flusso radiante viene riflesso e quanto viene assorbito).
+#     Se assorbo tutta la radiazione, la riflettanza è pari a 0; se viene riflessa tutta la luce, la riflettanza (in questo caso) è 65535 (16 bit).
 
-# Effettuo il plot dell'immagine satellitare che ne deriva.
+# Effettuo il plot dell'immagine satellitare che ne deriva, con la funzione RGB (Red-Green-Blue).
 plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 
 # Creo un pdf del plot, nominandolo "delta.pdf"; 
@@ -88,7 +88,7 @@ plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 # Layer 5 = NIR
 # NB: bande legate al satellite Sentinel-2.
 
-# Creo le Classi di suddivisione dell'area, e la verifico nel plot
+# Creo le Classi di suddivisione dell'area, e la verifico nel plot.
 # Decido di creare 3 classi, in quanto i componenti principali del territorio sono: acqua, suolo nudo, vegetazione.
 delta3 <- unsuperClass(delta, nClasses=3)
 
@@ -175,6 +175,7 @@ attr(,"class")
 [1] "rasterPCA" "RStoolbox"
 
 # Si nota come l'immagine caricata sia composta solo da 3 variabili, e da 1.102.500 osservazioni.
+
 # Vado ora a vedere quanto pesano le 3 variabili sulla costruzione della variabilità dell'immagine.
 summary(delPCA$model)
 
@@ -188,7 +189,7 @@ Cumulative Proportion   0.9232639  0.98404988  1.00000000
 # Come indicato dal Dataframe in uscita, si nota che:
 # - la componente 1 riesce a spiegare ben il 92.33% della variabilità dell'immagine;
 # - la componente 2 spiega il 6.08% della variabilità;
-# - la componente 3 spiega lo 1.59%
+# - la componente 3 spiega l'1.59%
 
 # Di conseguenza, scelgo la componente n.1 per spiegare la variabilità dell'immagine (in quanto vado ad utilizzare una sola variabile).
 
@@ -301,8 +302,8 @@ cl <- colorRampPalette(c("dark blue", "yellow", "red", "black")) (100)
 plot(dvi2022, col=cl)
 
 # L'immagine che esce è caratterizzata da un'enorme distesa blu, legata alla presenza di acqua, che non riflette/riflette pochissimo
-# nella banda del NIR; l'enorme presenza di giallo, invece, conferma una grande distesa di vegetazione, formata sia da zona rurale, 
-# che da zone boschive (canneti di zone umide, pinete, boschi igrofili).
+# nella banda del NIR; l'enorme presenza di giallo, invece, conferma una grande distesa di vegetazione, formata sia da zone rurali, 
+# che da zone nauturali (canneti, praterie di zone umide, pinete, boschi igrofili).
 
 # Vado ora a standardizzare il risultato, in modo tale da poterlo eventualmente confrontare con altre elaborazioni.
 # NDVI = Normalized Diferential Vegetation Index
