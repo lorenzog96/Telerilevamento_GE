@@ -131,8 +131,8 @@ data <- data.frame(Class, Percent)
 # Risultato
        Class Percent
 1      Water   44.10
-2 Vegetation   25.97
-3       Soil   29.93
+2 Vegetation   29.93
+3       Soil   25.97
 
 # Vado ora a verificare la Variabilità dell'area di interesse.
 
