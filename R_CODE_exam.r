@@ -92,7 +92,7 @@ plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 # Decido di creare 3 classi, in quanto i componenti principali del territorio sono: acqua, suolo nudo, vegetazione.
 delta3 <- unsuperClass(delta, nClasses=3)
 
-cl <- colorRampPalette(c("yellow", "blue", "green"))(100)
+cl <- colorRampPalette(c("blue", "green", "yellow"))(100)
 plot(delta3$map, col=cl)
 
 # Creo un unico Multiframe con la visione in spettro visibile e la classificazione.
