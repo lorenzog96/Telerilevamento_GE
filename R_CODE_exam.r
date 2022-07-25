@@ -11,7 +11,7 @@ library(raster) # Necessario per caricare e operare dati raster ("immagini sovra
 library(RStoolbox) # Necessario per la produzione degli Indici Spettrali e la Classificazione
 library(ggplot2) # Necessario come altra modalità oltre a raster per tradurre graficamente i dati
 library(patchwork) # Pacchetto semplificato per la produzione di Multiframe
-library(viridis) # Pacchetto utile per aggiungere palette di colori preimpostati e utili per lo studio
+library(viridis) # Pacchetto utile per aggiungere palette di colori preimpostate e utili per lo studio
 
 # Definisco la cartella da cui verranno prelevati i file
 setwd("C:/Users/Lorenzo/Desktop/exam")
@@ -19,7 +19,7 @@ setwd("C:/Users/Lorenzo/Desktop/exam")
 # Carico la lista dei file necessari, conferendo come oggetto "images-list"
 ilist <- list.files(pattern="T32TQQ_")
 
-# Info ilist (si tratta di file .jp2, che rappresentano le varie bande dello spettro di onde che vengono captate da Sentinel-2):
+# Info "ilist" (si tratta di file .jp2, che rappresentano le varie bande dello spettro di onde che vengono captate da Sentinel-2):
 [1] "T32TQQ_20220717T100611_B01_20m.jp2"
 [2] "T32TQQ_20220717T100611_B02_20m.jp2"
 [3] "T32TQQ_20220717T100611_B03_20m.jp2"
@@ -31,7 +31,7 @@ ilist <- list.files(pattern="T32TQQ_")
 [9] "T32TQQ_20220717T100611_B12_20m.jp2"
 [10] "T32TQQ_20220717T100611_B8A_20m.jp2"
 
-# Le bande riflettono rispettivamente:
+# Le bande captate sono rispettivamente:
 # B01 = Coastal Aerosol
 # B02 = Blue
 # B03 = Green
@@ -87,7 +87,7 @@ plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 # Layer 5 = NIR
 # NB: bande legate al satellite Sentinel-2.
 
-# Creo le Classi di suddivisione dell'area, e la verifico nel plot.
+# Creo le Classi di suddivisione dell'area, e la verifico nel plot (con apposito range di colori scelto, funzione colorRampPalette).
 # Decido di creare 3 classi, in quanto i componenti principali del territorio sono: acqua, suolo nudo, vegetazione.
 delta3 <- unsuperClass(delta, nClasses=3)
 
@@ -112,9 +112,9 @@ freq(delta3$map)
 [2,]     2 13290500
 [3,]     3  9021625
 
-# Dalle frequenze si nota come l'area considerata è prevalentemente ricoperta da acqua (classe 2 - richiama il maggior numero di pixel),
-# in particolar modo a causa della presenza dell'Adriatico. Per quanto riguarda suolo incolto e aree
-# vegetate (agricoltura e pinete), rispettivamente classe 1 e classe 3, hanno una frequenza abbastanza simile fra loro.
+# Dalle frequenze si nota come l'area considerata è prevalentemente ricoperta dalla Classe 2 (richiama il maggior numero di pixel), che dal plot possiamo
+# dedurre essere acqua, in particolare per della presenza dell'Adriatico. Per quanto riguarda suolo incolto e aree
+# vegetate (agricoltura e zone naturali), rispettivamente classe 1 e classe 3, hanno una frequenza abbastanza simile fra loro.
 
 # Utilizzo i dati di frequenza per creare le percentuali di suddivisione del Land Cover.
 totdelta <- 30140100
@@ -124,7 +124,7 @@ perc_suo <- 100 - (perc_acq + perc_veg)
 
 # Creo un Dataframe per sistemare i risultati percentuali.
 Class <- c("Water", "Vegetation", "Soil")
-Percent <- c(44.1, 25.97, 29.93)
+Percent <- c(44.1, 29.93, 25.97)
 data <- data.frame(Class, Percent)
 
 # Risultato
@@ -284,7 +284,7 @@ values     : 0, 109656  (min, max)
 cl <- colorRampPalette(c("dark blue", "yellow", "red", "black")) (100)
 plot(dvi2022, col=cl)
 
-# L'immagine che esce è caratterizzata da un'enorme distesa blu, legata alla presenza di acqua, che non riflette/riflette pochissimo
+# L'immagine è caratterizzata da un'enorme distesa blu, legata alla presenza di acqua, che non riflette/riflette pochissimo
 # nella banda del NIR; l'enorme presenza di giallo, invece, conferma una grande distesa di vegetazione, formata sia da zone rurali, 
 # che da zone nauturali (canneti, praterie di zone umide, pinete, boschi igrofili).
 
