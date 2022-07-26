@@ -267,7 +267,7 @@ plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 # DVI -> Differential Vegetation Index
 # DVI = NIR - red (il calcolo vede sottrarre la banda del rosso dalla banda di infrarosso vicino, in quanto le piante hanno più alta riflettanza su tale banda
 #       rispetto al resto degli elementi presenti in un'immagine satellitare.
-NIR <- delta[[4]] + delta[[5]] + delta[[6]] + delta[[7]] + delta[[8]] + delta[[9]] + delta[[10]]
+NIR <- delta[[4]] + delta[[5]] + delta[[6]] + delta[[7]] + delta[[10]]
 dvi2022 <- NIR - delta[[3]]
 
 # Info dvi2022
