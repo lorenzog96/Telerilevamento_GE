@@ -113,7 +113,7 @@ freq(delta3$map)
 [3,]     3  9021625
 
 # Dalle frequenze si nota come l'area considerata è prevalentemente ricoperta dalla Classe 2 (richiama il maggior numero di pixel), che dal plot possiamo
-# dedurre essere acqua, in particolare per della presenza dell'Adriatico. Per quanto riguarda suolo incolto e aree
+# dedurre essere acqua, in particolare per la presenza dell'Adriatico. Per quanto riguarda suolo incolto e aree
 # vegetate (agricoltura e zone naturali), rispettivamente classe 1 e classe 3, hanno una frequenza abbastanza simile fra loro.
 
 # Utilizzo i dati di frequenza per creare le percentuali di suddivisione del Land Cover.
