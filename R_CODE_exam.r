@@ -267,8 +267,8 @@ plotRGB(delta, r=4, g=3, b=2, stretch="lin")
 # DVI -> Differential Vegetation Index
 # DVI = NIR - red (il calcolo vede sottrarre la banda del rosso dalla banda di infrarosso vicino, in quanto le piante hanno più alta riflettanza su tale banda
 #       rispetto al resto degli elementi presenti in un'immagine satellitare.
-NIR <- delta[[4]] + delta[[5]] + delta[[6]] + delta[[7]] + delta[[10]]
-dvi2022 <- NIR - delta[[3]]
+NIR <- delta[[5]] + delta[[6]] + delta[[7]] + delta[[10]]
+dvi2022 <- NIR - delta[[4]]
 
 # Info dvi2022
 class      : RasterLayer 
@@ -276,13 +276,12 @@ dimensions : 5490, 5490, 30140100  (nrow, ncol, ncell)
 resolution : 20, 20  (x, y)
 extent     : 699960, 809760, 4890240, 5000040  (xmin, xmax, ymin, ymax)
 crs        : +proj=utm +zone=32 +datum=WGS84 +units=m +no_defs 
-source     : r_tmp_2022-07-24_213820_492_70408.grd 
+source     : r_tmp_2022-07-26_091229_9312_97809.grd 
 names      : layer 
-values     : 0, 109656  (min, max)
+values     : 0, 60724  (min, max)
 
 # Creo il plot del DVI
-cl <- colorRampPalette(c("dark blue", "yellow", "red", "black")) (100)
-plot(dvi2022, col=cl)
+plot(dvi2022)
 
 # L'immagine è caratterizzata da un'enorme distesa blu, legata alla presenza di acqua, che non riflette/riflette pochissimo
 # nella banda del NIR; l'enorme presenza di giallo, invece, conferma una grande distesa di vegetazione, formata sia da zone rurali, 
@@ -290,7 +289,7 @@ plot(dvi2022, col=cl)
 
 # Vado ora a standardizzare il risultato, in modo tale da poterlo eventualmente confrontare con altre elaborazioni.
 # NDVI = Normalized Diferential Vegetation Index
-ndvi2022 <- dvi2022/(NIR+delta[[3]])
+ndvi2022 <- dvi2022/(NIR+delta[[4]])
 
 # Info ndvi2022
 class      : RasterLayer 
@@ -308,7 +307,7 @@ values     : 0.4370455, 0.9318111  (min, max)
 # Infine plottiamo in un unico Multiframe l'Indice di Vegetazione e l'immagine satellitare di partenza.
 par(mfrow=c(1,2))
 plotRGB(delta, r=4, g=3, b=2, stretch="lin")
-plot(ndvi2022, col=cl)
+plot(ndvi2022)
 
 ### Fine progetto ###
 
