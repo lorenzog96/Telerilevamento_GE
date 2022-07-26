@@ -283,8 +283,8 @@ values     : 0, 60724  (min, max)
 # Creo il plot del DVI
 plot(dvi2022)
 
-# L'immagine è caratterizzata da un'enorme distesa blu, legata alla presenza di acqua, che non riflette/riflette pochissimo
-# nella banda del NIR; l'enorme presenza di giallo, invece, conferma una grande distesa di vegetazione, formata sia da zone rurali, 
+# L'immagine è caratterizzata da un'enorme distesa chiara legata alla presenza di acqua, che non riflette/riflette pochissimo
+# nella banda del NIR; la presenza del rosso più evidente, invece, conferma una grande distesa di vegetazione, formata sia da zone rurali, 
 # che da zone nauturali (canneti, praterie di zone umide, pinete, boschi igrofili).
 
 # Vado ora a standardizzare il risultato, in modo tale da poterlo eventualmente confrontare con altre elaborazioni.
